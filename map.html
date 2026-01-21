@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stranger Traffic Map</title>
+    <style>
+        html, body { 
+            height: 100%; 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden;
+        }
+        #map { 
+            height: 100%; 
+            width: 100%;
+        }
+        .gmnoprint, .gm-control-active, .gm-style-cc, .gm-svpc { 
+            display: none !important; 
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const apiKey = urlParams.get('key'); 
+        const lat = parseFloat(urlParams.get('lat')) || 41.9028;
+        const lng = parseFloat(urlParams.get('lng')) || 12.4964;
+        const zoomLvl = parseInt(urlParams.get('zoom')) || 14;
+
+        window.initMap = function() {
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: lat, lng: lng },
+                zoom: zoomLvl,
+                disableDefaultUI: true,
+                styles: [
+                    { featureType: "poi", stylers: [{ visibility: "off" }] }
+                ]
+            });
+
+            const trafficLayer = new google.maps.TrafficLayer();
+            trafficLayer.setMap(map);
+        }
+
+        if (apiKey) {
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap`;
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        } else {
+            console.error("Nessuna API Key trovata nell'URL.");
+            document.getElementById("map").innerHTML = "Errore: API Key mancante";
+        }
+    </script>
+</body>
+</html>
